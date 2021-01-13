@@ -1,0 +1,774 @@
+---
+swagger: "2.0"
+info:
+  description: "REST service documentation. Swagger used."
+  version: "v1"
+  title: "Evening courses REST service documentation"
+host: "www.example.com:8080"
+basePath: "/rest"
+schemes:
+- "http"
+- "https"
+paths:
+  /application:
+    post:
+      operationId: "postApplication"
+      parameters:
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "surname"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "patronymic"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "phone"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "email"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "evclassId"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "source"
+        in: "formData"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /evclass:
+    post:
+      operationId: "postEvclass"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "evcourseId"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "dateBegin"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "dateEnd"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "price"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /evclass/all:
+    get:
+      operationId: "getEvclass"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /evclass/{id}:
+    get:
+      operationId: "getEvclass"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Evclass"
+    put:
+      operationId: "updateEvclass"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "evcourseId"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "dateBegin"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "dateEnd"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "price"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteEvclass"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /evclassEvstudent:
+    post:
+      operationId: "postEvclassEvstudent"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "evclassId"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "evstudentId"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "consultationTimeStamp"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "paymentState"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "contractState"
+        in: "formData"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /evclassEvstudent/all:
+    get:
+      operationId: "getEvclassEvstudent"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /evclassEvstudent/{id}:
+    get:
+      operationId: "getEvclassEvstudent"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/EvclassEvstudent"
+    put:
+      operationId: "updateEvclassEvstudent"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "evclassId"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "evstudentId"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "consultationTimeStamp"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "paymentState"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "contractState"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteEvstudent"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /evcourse:
+    post:
+      operationId: "postEvcourse"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "code"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "shortName"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "version"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "duration"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "price"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /evcourse/all:
+    get:
+      operationId: "getEvcourse"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /evcourse/{id}:
+    get:
+      operationId: "getEvcourse"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Evcourse"
+    put:
+      operationId: "updateEvcourse"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "code"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "name"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "shortName"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "version"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "duration"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "price"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteEvcourse"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /evstudent:
+    post:
+      operationId: "postEvstudent"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "surname"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "patronymic"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "phone"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "email"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "source"
+        in: "formData"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /evstudent/all:
+    get:
+      operationId: "getEvstudent"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /evstudent/{id}:
+    get:
+      operationId: "getEvstudent"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Evstudent"
+    put:
+      operationId: "updateEvstudent"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "name"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "surname"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "patronymic"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "phone"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "email"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "source"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteEvstudent"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /seminar:
+    post:
+      operationId: "postSeminar"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "shortName"
+        in: "formData"
+        required: false
+        type: "string"
+      - name: "seminarTimeStamp"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "duration"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "price"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /seminar/all:
+    get:
+      operationId: "getSeminar"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /seminar/{id}:
+    get:
+      operationId: "getSeminar"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Seminar"
+    put:
+      operationId: "updateSeminar"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "name"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "shortName"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "seminarTimeStamp"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "duration"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "price"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteSeminar"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /seminarEvstudent:
+    post:
+      operationId: "postSeminarEvstudent"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "seminarId"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "evstudentId"
+        in: "formData"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "paymentState"
+        in: "formData"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /seminarEvstudent/all:
+    get:
+      operationId: "getSeminarEvstudent"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /seminarEvstudent/{id}:
+    get:
+      operationId: "getSeminarEvstudent"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SeminarEvstudent"
+    put:
+      operationId: "updateSeminarEvstudent"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "seminarId"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "evstudentId"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "consultationDate"
+        in: "query"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "paymentState"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "contractState"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteEvstudent"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+definitions:
+  Evclass:
+    type: "object"
+    properties:
+      evclassId:
+        type: "integer"
+        format: "int32"
+      evcourseId:
+        type: "integer"
+        format: "int32"
+      dateBegin:
+        type: "string"
+        format: "date-time"
+      dateEnd:
+        type: "string"
+        format: "date-time"
+      price:
+        type: "integer"
+        format: "int32"
+  EvclassEvstudent:
+    type: "object"
+    properties:
+      evclassEvstudentId:
+        type: "integer"
+        format: "int32"
+      evclassId:
+        type: "integer"
+        format: "int32"
+      evstudentId:
+        type: "integer"
+        format: "int32"
+      consultationTimeStamp:
+        type: "string"
+        format: "date-time"
+      paymentState:
+        type: "string"
+      contractState:
+        type: "string"
+  Evcourse:
+    type: "object"
+    properties:
+      evcourseId:
+        type: "integer"
+        format: "int32"
+      code:
+        type: "string"
+      name:
+        type: "string"
+      shortName:
+        type: "string"
+      version:
+        type: "string"
+      duration:
+        type: "integer"
+        format: "int32"
+      price:
+        type: "integer"
+        format: "int32"
+  Evstudent:
+    type: "object"
+    properties:
+      evstudentId:
+        type: "integer"
+        format: "int32"
+      name:
+        type: "string"
+      surname:
+        type: "string"
+      patronymic:
+        type: "string"
+      phone:
+        type: "string"
+      email:
+        type: "string"
+      source:
+        type: "string"
+  Seminar:
+    type: "object"
+    properties:
+      seminarId:
+        type: "integer"
+        format: "int32"
+      name:
+        type: "string"
+      shortName:
+        type: "string"
+      seminarTimeStamp:
+        type: "string"
+        format: "date-time"
+      duration:
+        type: "integer"
+        format: "int32"
+      price:
+        type: "integer"
+        format: "int32"
+  SeminarEvstudent:
+    type: "object"
+    properties:
+      seminarEvstudentId:
+        type: "integer"
+        format: "int32"
+      seminarId:
+        type: "integer"
+        format: "int32"
+      evstudentId:
+        type: "integer"
+        format: "int32"
+      paymentState:
+        type: "string"

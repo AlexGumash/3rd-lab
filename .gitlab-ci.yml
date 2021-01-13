@@ -1,0 +1,108 @@
+image: docker:19.03.8
+stages:
+   - build
+   - prepare_prod_release
+   - deploy_test
+   - deploy_prod
+
+variables:
+#  DOCKER_TLS_CERTDIR: "/certs/"
+#  DOCKER_DRIVER: overlay
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+# IMAGE_TAG: 192.168.101.210:5005/evening-courses/service:db-params
+
+services:
+  - docker:19.03.8-dind
+   
+before_script:
+#  - sed -i "s/{DB_HOST}/${DB_HOST}/g" src/main/resources/hibernate.cfg.xml
+#  - sed -i "s/{DB_PORT}/${DB_PORT}/g" src/main/resources/hibernate.cfg.xml
+#  - sed -i "s/{DB_NAME}/${DB_NAME}/g" src/main/resources/hibernate.cfg.xml
+#  - sed -i "s/{DB_USER}/${DB_USER}/g" src/main/resources/hibernate.cfg.xml
+#  - sed -i "s/{DB_PASSWORD}/${DB_PASSWORD}/g" src/main/resources/hibernate.cfg.xml
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  
+build:
+  image: docker:19.03.8
+  stage: build
+  script:
+      - echo $IMAGE_TAG
+#     - ls -R /etc/docker
+#     - ls -R /etc/docker/certs.d/
+#     - docker pull $CI_REGISTRY_IMAGE:latest || true
+#     - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:latest .
+#     - docker build -t evening-rest .
+#     - docker tag evening-rest eve/evening-rest
+      - docker build --no-cache -t $IMAGE_TAG -t $CI_REGISTRY_IMAGE:latest .
+      - docker push $IMAGE_TAG
+      - docker push $CI_REGISTRY_IMAGE:latest
+#      - echo ${CI_COMMIT_TAG:?""} && docker tag $IMAGE_TAG $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG || true
+#      - echo ${CI_COMMIT_TAG:?""} && docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG || true
+#      - docker push 
+
+prepare_prod_release:
+  image: docker:19.03.8
+  stage: prepare_prod_release
+  script:
+      - docker tag $IMAGE_TAG $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+      - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
+
+deploy_test:
+  stage: deploy_test
+  variables:
+    DOCKER_TEST_SERVER: 192.168.101.209
+    DOCKER_TEST_USER: docker
+    CONTAINER_NAME: evening_rest_service
+    CONTAINER_PORT: 8080
+    HOST_PORT: 8080
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H ${DOCKER_TEST_SERVER} >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploy to test server - ${DOCKER_TEST_SERVER}"
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "mkdir -p /etc/docker/certs.d/${CI_REGISTRY}/" || true
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "openssl s_client -connect 192.168.101.210:5005 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /etc/docker/certs.d/${CI_REGISTRY}/ca.crt"
+    - cat /etc/docker/certs.d/${CI_REGISTRY}/ca.crt
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY};"
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "docker stop ${CONTAINER_NAME}" || true
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "docker rm ${CONTAINER_NAME}" || true
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "docker rmi $IMAGE_TAG" || true
+    - ssh ${DOCKER_TEST_USER}@${DOCKER_TEST_SERVER} "docker run --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} -d -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_NAME=${DB_NAME} -e DB_USER=${DB_USER} -e DB_PASSWORD=${DB_PASSWORD} $IMAGE_TAG"
+  environment:
+    name: test
+    
+deploy_prod:
+  stage: deploy_prod
+  variables:
+    DOCKER_PROD_SERVER: 192.168.101.210
+    DOCKER_PROD_USER: docker
+    CONTAINER_NAME: evening_rest_service
+    CONTAINER_PORT: 8080
+    HOST_PORT: 8080
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H ${DOCKER_PROD_SERVER} >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploy to production server - ${DOCKER_PROD_SERVER}"
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "mkdir -p /etc/docker/certs.d/${CI_REGISTRY}/" || true
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "openssl s_client -connect 192.168.101.210:5005 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /etc/docker/certs.d/${CI_REGISTRY}/ca.crt"
+    - cat /etc/docker/certs.d/${CI_REGISTRY}/ca.crt
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY};"
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "docker stop ${CONTAINER_NAME}" || true
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "docker rm ${CONTAINER_NAME}" || true
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG" || true
+    - ssh ${DOCKER_PROD_USER}@${DOCKER_PROD_SERVER} "docker run --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} -d -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_NAME=${DB_NAME} -e DB_USER=${DB_USER} -e DB_PASSWORD=${DB_PASSWORD} $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+  environment:
+    name: production
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
